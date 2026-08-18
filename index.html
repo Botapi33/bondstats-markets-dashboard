@@ -1,952 +1,3540 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bond Market Dashboard | BondStats</title>
-  <meta
-    name="description"
-    content="A live global bond market dashboard tracking sovereign 10-year yields, top movers, benchmark markets and regional yield structure."
-  />
-  <style>
-    :root {
-      --bg-1: #06111d;
-      --bg-2: #0b1626;
-      --panel: rgba(12, 24, 40, 0.95);
-      --panel-2: rgba(17, 31, 50, 0.98);
-      --panel-3: rgba(20, 37, 58, 0.98);
-      --border: rgba(138, 170, 215, 0.15);
-      --text: #eef4fb;
-      --muted: #9bb0c8;
-      --soft: #7f94ad;
-      --accent: #89b8ff;
-      --good: #7fd39a;
-      --warn: #ffd27d;
-      --bad: #ff9f9f;
-      --radius: 22px;
-      --radius-sm: 16px;
-      --shadow: 0 18px 42px rgba(0,0,0,0.34);
-      --max: 1360px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    * { box-sizing: border-box; }
+<title>Bond Market Dashboard | BondStats</title>
 
-    body {
-      margin: 0;
-      font-family: Inter, Arial, Helvetica, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 10% 8%, rgba(80, 118, 178, 0.18), transparent 26%),
-        radial-gradient(circle at 88% 12%, rgba(89, 118, 162, 0.12), transparent 20%),
-        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
+<meta
+  name="description"
+  content="Global sovereign bond market intelligence tracking 10-year yields, daily market moves, regional rates and spreads across major economies."
+>
 
-    .wrap {
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 26px 18px 40px;
-    }
+<style>
 
-    .hero,
-    .panel,
-    .stat,
-    .mini-card,
-    .benchmark-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
+:root{
+  --bg:#030605;
+  --bg2:#050908;
+  --surface:#07100d;
+  --surface2:#09130f;
+  --surface3:#0b1612;
 
-    .hero {
-      padding: 26px;
-      margin-bottom: 18px;
-      position: relative;
-      overflow: hidden;
-    }
+  --text:#eef5f1;
+  --muted:#8e9d95;
+  --muted2:#59685f;
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      right: -90px;
-      bottom: -90px;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(137, 184, 255, 0.12) 0%, transparent 65%);
-      pointer-events: none;
-    }
+  --line:rgba(132,166,149,.14);
+  --line2:rgba(132,166,149,.25);
 
-    .eyebrow {
-      margin: 0 0 10px;
-      color: var(--accent);
-      font-size: 12px;
-      letter-spacing: .09em;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
+  --green:#34df91;
+  --green2:#71f2b0;
+  --green-soft:rgba(52,223,145,.08);
+  --green-glow:rgba(52,223,145,.16);
 
-    h1 {
-      margin: 0 0 14px;
-      font-size: 46px;
-      line-height: 1.02;
-      letter-spacing: -0.03em;
-      max-width: 960px;
-    }
+  --amber:#eeb66c;
+  --red:#e47b72;
 
-    .hero p {
-      margin: 0;
-      color: var(--muted);
-      max-width: 1020px;
-      font-size: 17px;
-    }
+  --radius:18px;
+  --max:1380px;
+}
 
-    .hero-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
-    }
+*{
+  box-sizing:border-box;
+}
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      min-height: 38px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      font-size: 13px;
-      color: #d8e7fb;
-      font-weight: 600;
-    }
+html,
+body{
+  margin:0;
+  padding:0;
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
 
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-      margin-bottom: 18px;
-    }
+body{
+  color:var(--text);
 
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 18px;
-    }
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Helvetica,
+    Arial,
+    sans-serif;
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
+  background:
+    radial-gradient(
+      circle at 20% -10%,
+      rgba(52,223,145,.075),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      #030605,
+      #020403
+    );
 
-    .stat {
-      padding: 18px;
-      background: var(--panel-2);
-    }
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
 
-    .stat-label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--soft);
-      font-weight: 800;
-    }
+button,
+input{
+  font:inherit;
+}
 
-    .stat-value {
-      font-size: 34px;
-      font-weight: 800;
-      line-height: 1.06;
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
-    }
+.wrap{
+  width:100%;
+  max-width:var(--max);
 
-    .stat-note {
-      color: var(--muted);
-      font-size: 14px;
-    }
+  margin:0 auto;
+  padding:18px;
+}
 
-    .panel {
-      padding: 20px;
-    }
 
-    h2 {
-      margin: 0 0 8px;
-      font-size: 28px;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-    }
+/* =========================================================
+   SHELL
+========================================================= */
 
-    .sub {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 15px;
-    }
+.shell{
+  overflow:hidden;
 
-    .benchmark-card {
-      padding: 18px;
-      background: var(--panel-2);
-    }
+  border:1px solid var(--line);
+  border-radius:20px;
 
-    .benchmark-name {
-      font-size: 14px;
-      color: var(--soft);
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      margin-bottom: 8px;
-    }
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8,14,12,.985),
+      rgba(3,6,5,.99)
+    );
 
-    .benchmark-yield {
-      font-size: 30px;
-      font-weight: 800;
-      line-height: 1.05;
-      margin-bottom: 6px;
-    }
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.38);
+}
 
-    .benchmark-change {
-      font-size: 14px;
-      color: var(--muted);
-    }
 
-    .mini-card {
-      padding: 16px;
-      background: var(--panel-2);
-    }
+/* =========================================================
+   TOP BAR
+========================================================= */
 
-    .mini-card h3 {
-      margin: 0 0 8px;
-      font-size: 18px;
-      letter-spacing: -0.01em;
-    }
+.topbar{
+  min-height:50px;
 
-    .mini-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 
-    .market-list {
-      margin-top: 12px;
-      display: grid;
-      gap: 10px;
-    }
+  gap:20px;
 
-    .market-row {
-      display: grid;
-      grid-template-columns: 1.2fr .8fr .8fr .9fr;
-      gap: 10px;
-      align-items: center;
-      padding: 11px 12px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.05);
-      font-size: 14px;
-    }
+  padding:0 24px;
 
-    .market-name {
-      font-weight: 700;
-    }
+  border-bottom:1px solid var(--line);
+}
 
-    .chart-shell {
-      background: var(--panel-3);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-      min-height: 520px;
-    }
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
 
-    canvas {
-      width: 100%;
-      height: 430px;
-      display: block;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.00));
-    }
+  min-width:0;
+}
 
-    .table-wrap {
-      overflow-x: auto;
-      margin-top: 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: var(--panel-3);
-    }
+.live-dot{
+  width:7px;
+  height:7px;
 
-    table {
-      width: 100%;
-      min-width: 1160px;
-      border-collapse: collapse;
-    }
+  flex:0 0 auto;
 
-    thead th {
-      text-align: left;
-      padding: 14px 12px;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      color: var(--soft);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
-      white-space: nowrap;
-    }
+  border-radius:50%;
+  background:var(--green);
 
-    tbody td {
-      padding: 14px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      font-size: 14px;
-      color: var(--text);
-      vertical-align: middle;
-    }
+  box-shadow:
+    0 0 14px rgba(52,223,145,.8);
+}
 
-    tbody tr:hover {
-      background: rgba(255,255,255,0.03);
-    }
+.brand-name{
+  color:var(--green2);
 
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
+  font-size:10px;
+  font-weight:750;
 
-    .country {
-      font-weight: 700;
-    }
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
 
-    .bar-cell {
-      min-width: 180px;
-    }
+.top-meta{
+  display:flex;
+  align-items:center;
+  gap:18px;
 
-    .bar-track {
-      width: 100%;
-      height: 10px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.06);
-      position: relative;
-    }
+  color:var(--muted2);
 
-    .bar-fill {
-      position: absolute;
-      inset: 0 auto 0 0;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #8cbaff, #d8e8ff);
-    }
+  font-size:9px;
+  font-weight:650;
 
-    .positive { color: var(--warn); font-weight: 700; }
-    .negative { color: var(--good); font-weight: 700; }
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
 
-    .footnote {
-      margin-top: 12px;
-      color: var(--soft);
-      font-size: 12px;
-      line-height: 1.5;
-    }
 
-    .empty {
-      color: var(--muted);
-    }
+/* =========================================================
+   HERO
+========================================================= */
 
-    @media (max-width: 1200px) {
-      .grid-4,
-      .grid-3 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+.hero{
+  display:grid;
 
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-    }
+  grid-template-columns:
+    minmax(0,1.45fr)
+    minmax(310px,.55fr);
 
-    @media (max-width: 720px) {
-      .wrap {
-        padding: 14px 12px 28px;
-      }
+  gap:46px;
 
-      .hero, .panel, .stat, .mini-card, .benchmark-card {
-        border-radius: 18px;
-      }
+  padding:38px 32px 34px;
 
-      .hero, .panel {
-        padding: 18px;
-      }
+  border-bottom:1px solid var(--line);
 
-      h1 {
-        font-size: 32px;
-      }
+  background:
+    linear-gradient(
+      100deg,
+      rgba(52,223,145,.035),
+      transparent 55%
+    );
+}
 
-      h2 {
-        font-size: 24px;
-      }
+.hero > *{
+  min-width:0;
+}
 
-      .grid-4,
-      .grid-3 {
-        grid-template-columns: 1fr;
-      }
+.eyebrow{
+  margin:0 0 13px;
 
-      .stat-value {
-        font-size: 30px;
-      }
+  color:var(--green);
 
-      canvas {
-        height: 360px;
-      }
-    }
-  </style>
+  font-size:9px;
+  font-weight:750;
+
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+
+h1{
+  margin:0;
+
+  font-size:
+    clamp(38px,5vw,66px);
+
+  line-height:.96;
+
+  letter-spacing:-.05em;
+  font-weight:650;
+}
+
+.hero-copy{
+  margin-top:17px;
+
+  max-width:810px;
+
+  color:var(--muted);
+
+  font-size:14px;
+  line-height:1.75;
+}
+
+.hero-status{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+
+  align-self:end;
+
+  overflow:hidden;
+
+  border:1px solid var(--line);
+  border-radius:13px;
+
+  background:var(--line);
+  gap:1px;
+}
+
+.status-cell{
+  padding:16px;
+
+  min-width:0;
+
+  background:
+    rgba(7,14,11,.98);
+}
+
+.status-label{
+  color:var(--muted2);
+
+  font-size:8px;
+  font-weight:750;
+
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+
+.status-value{
+  margin-top:7px;
+
+  font-size:17px;
+  font-weight:640;
+
+  overflow-wrap:anywhere;
+}
+
+.status-sub{
+  margin-top:5px;
+
+  color:var(--muted);
+
+  font-size:10px;
+  line-height:1.45;
+}
+
+
+/* =========================================================
+   MARKET PULSE
+========================================================= */
+
+.pulse-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,minmax(0,1fr));
+
+  border-bottom:1px solid var(--line);
+}
+
+.pulse{
+  position:relative;
+
+  min-width:0;
+  padding:23px 24px 22px;
+
+  border-right:1px solid var(--line);
+}
+
+.pulse:last-child{
+  border-right:0;
+}
+
+.pulse::before{
+  content:"";
+
+  position:absolute;
+
+  left:24px;
+  top:0;
+
+  width:36px;
+  height:1px;
+
+  background:var(--green);
+}
+
+.pulse-label{
+  color:var(--muted2);
+
+  font-size:8px;
+  font-weight:750;
+
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+
+.pulse-value{
+  margin-top:12px;
+
+  font-size:
+    clamp(27px,3vw,39px);
+
+  line-height:1;
+
+  font-weight:650;
+
+  letter-spacing:-.04em;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.pulse-value.green{
+  color:var(--green2);
+}
+
+.pulse-value.amber{
+  color:var(--amber);
+}
+
+.pulse-note{
+  margin-top:9px;
+
+  color:var(--muted);
+
+  font-size:11px;
+  line-height:1.5;
+}
+
+
+/* =========================================================
+   SECTION GENERAL
+========================================================= */
+
+.section{
+  border-bottom:1px solid var(--line);
+}
+
+.section:last-child{
+  border-bottom:0;
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+
+  gap:25px;
+
+  padding:25px 30px 18px;
+}
+
+.section-head > *{
+  min-width:0;
+}
+
+.section-kicker{
+  margin-bottom:8px;
+
+  color:var(--muted2);
+
+  font-size:8px;
+  font-weight:750;
+
+  letter-spacing:.15em;
+  text-transform:uppercase;
+}
+
+h2{
+  margin:0;
+
+  font-size:27px;
+
+  line-height:1.05;
+
+  letter-spacing:-.035em;
+  font-weight:630;
+}
+
+.section-copy{
+  margin-top:8px;
+
+  max-width:690px;
+
+  color:var(--muted);
+
+  font-size:12px;
+  line-height:1.65;
+}
+
+.section-side{
+  color:var(--muted2);
+
+  font-size:9px;
+
+  letter-spacing:.1em;
+  text-transform:uppercase;
+
+  text-align:right;
+}
+
+
+/* =========================================================
+   BENCHMARK STRIP
+========================================================= */
+
+.benchmark-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,minmax(0,1fr));
+
+  border-top:1px solid var(--line);
+}
+
+.benchmark{
+  min-width:0;
+
+  padding:23px 22px;
+
+  border-right:1px solid var(--line);
+}
+
+.benchmark:last-child{
+  border-right:0;
+}
+
+.benchmark-top{
+  display:flex;
+  justify-content:space-between;
+
+  gap:10px;
+
+  color:var(--muted2);
+
+  font-size:8px;
+  font-weight:750;
+
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+
+.benchmark-yield{
+  margin-top:14px;
+
+  font-size:34px;
+  font-weight:650;
+
+  letter-spacing:-.04em;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.benchmark-meta{
+  margin-top:8px;
+
+  color:var(--muted);
+
+  font-size:10px;
+  line-height:1.5;
+}
+
+.up{
+  color:var(--amber) !important;
+}
+
+.down{
+  color:var(--green) !important;
+}
+
+.flat{
+  color:var(--muted) !important;
+}
+
+
+/* =========================================================
+   MARKET CORE
+========================================================= */
+
+.market-core{
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1.18fr)
+    minmax(350px,.82fr);
+
+  border-top:1px solid var(--line);
+}
+
+.chart-area{
+  min-width:0;
+
+  padding:25px 26px 27px;
+
+  border-right:1px solid var(--line);
+}
+
+.movers-area{
+  min-width:0;
+
+  padding:25px 26px 27px;
+}
+
+.sub-head{
+  margin-bottom:18px;
+}
+
+.sub-title{
+  margin:0;
+
+  font-size:20px;
+  font-weight:625;
+
+  letter-spacing:-.025em;
+}
+
+.sub-copy{
+  margin-top:6px;
+
+  color:var(--muted);
+
+  font-size:11px;
+  line-height:1.55;
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+.chart-shell{
+  position:relative;
+
+  width:100%;
+  min-height:430px;
+
+  border:1px solid var(--line);
+  border-radius:13px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(52,223,145,.02),
+      transparent
+    );
+
+  overflow:hidden;
+}
+
+canvas{
+  display:block;
+
+  width:100%;
+  height:430px;
+}
+
+
+/* =========================================================
+   MOVERS
+========================================================= */
+
+.mover-group + .mover-group{
+  margin-top:24px;
+}
+
+.mover-label{
+  display:flex;
+  justify-content:space-between;
+
+  gap:15px;
+
+  margin-bottom:10px;
+
+  color:var(--muted2);
+
+  font-size:8px;
+  font-weight:750;
+
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+
+.mover-list{
+  border-top:1px solid var(--line);
+}
+
+.mover-row{
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1.2fr)
+    .65fr
+    .65fr;
+
+  gap:12px;
+
+  align-items:center;
+
+  padding:13px 0;
+
+  border-bottom:1px solid var(--line);
+
+  font-size:11px;
+}
+
+.mover-country{
+  font-weight:620;
+}
+
+.mover-value{
+  color:#dfe8e3;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.mover-change{
+  text-align:right;
+
+  font-weight:650;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+
+/* =========================================================
+   INTELLIGENCE STRIP
+========================================================= */
+
+.intel-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,minmax(0,1fr));
+
+  border-top:1px solid var(--line);
+}
+
+.intel{
+  min-width:0;
+
+  padding:20px 21px;
+
+  border-right:1px solid var(--line);
+}
+
+.intel:last-child{
+  border-right:0;
+}
+
+.intel-label{
+  color:var(--muted2);
+
+  font-size:8px;
+  font-weight:750;
+
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.intel-value{
+  margin-top:9px;
+
+  font-size:18px;
+  font-weight:625;
+
+  line-height:1.25;
+}
+
+.intel-sub{
+  margin-top:6px;
+
+  color:var(--muted);
+
+  font-size:10px;
+  line-height:1.45;
+}
+
+
+/* =========================================================
+   REGIONAL + SPREAD
+========================================================= */
+
+.two-col{
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(0,1fr);
+
+  border-top:1px solid var(--line);
+}
+
+.two-block{
+  min-width:0;
+
+  padding:25px 27px 28px;
+}
+
+.two-block:first-child{
+  border-right:1px solid var(--line);
+}
+
+
+/* =========================================================
+   COMPACT TABLE
+========================================================= */
+
+.compact-table{
+  margin-top:17px;
+
+  border-top:1px solid var(--line);
+}
+
+.compact-row{
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1.4fr)
+    .8fr
+    .8fr
+    .55fr;
+
+  gap:10px;
+
+  align-items:center;
+
+  padding:12px 0;
+
+  border-bottom:1px solid var(--line);
+
+  font-size:11px;
+}
+
+.compact-row.head{
+  color:var(--muted2);
+
+  font-size:8px;
+  font-weight:750;
+
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.compact-name{
+  font-weight:620;
+}
+
+
+/* =========================================================
+   SPREAD LIST
+========================================================= */
+
+.spread-list{
+  margin-top:17px;
+
+  border-top:1px solid var(--line);
+}
+
+.spread-row{
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    .7fr
+    minmax(100px,.8fr);
+
+  gap:15px;
+
+  align-items:center;
+
+  padding:12px 0;
+
+  border-bottom:1px solid var(--line);
+
+  font-size:11px;
+}
+
+.spread-country{
+  font-weight:620;
+}
+
+.spread-num{
+  text-align:right;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.spread-track{
+  height:3px;
+
+  border-radius:20px;
+
+  background:rgba(255,255,255,.055);
+
+  overflow:hidden;
+}
+
+.spread-fill{
+  height:100%;
+
+  background:var(--green);
+
+  border-radius:20px;
+}
+
+
+/* =========================================================
+   FULL TABLE
+========================================================= */
+
+.table-section{
+  padding-bottom:28px;
+}
+
+.table-tools{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  padding:0 30px 16px;
+}
+
+.search{
+  width:100%;
+  max-width:330px;
+
+  height:38px;
+
+  padding:0 13px;
+
+  color:var(--text);
+
+  background:rgba(255,255,255,.025);
+
+  border:1px solid var(--line);
+  border-radius:9px;
+
+  outline:none;
+}
+
+.search:focus{
+  border-color:
+    rgba(52,223,145,.38);
+}
+
+.search::placeholder{
+  color:var(--muted2);
+}
+
+.table-wrap{
+  overflow-x:auto;
+
+  margin:0 30px;
+
+  border-top:1px solid var(--line);
+}
+
+table{
+  width:100%;
+  min-width:1100px;
+
+  border-collapse:collapse;
+}
+
+thead th{
+  padding:13px 10px;
+
+  text-align:left;
+
+  color:var(--muted2);
+
+  font-size:8px;
+  font-weight:750;
+
+  letter-spacing:.1em;
+  text-transform:uppercase;
+
+  border-bottom:1px solid var(--line);
+
+  white-space:nowrap;
+}
+
+tbody td{
+  padding:13px 10px;
+
+  color:#dbe4df;
+
+  font-size:11px;
+
+  border-bottom:1px solid rgba(132,166,149,.09);
+
+  white-space:nowrap;
+}
+
+tbody tr:hover{
+  background:
+    rgba(52,223,145,.025);
+}
+
+.country-name{
+  color:var(--text);
+
+  font-weight:625;
+}
+
+.data-badge{
+  display:inline-flex;
+  align-items:center;
+
+  min-height:22px;
+
+  padding:3px 8px;
+
+  border-radius:20px;
+
+  border:1px solid var(--line);
+
+  color:var(--muted);
+
+  font-size:8px;
+  font-weight:700;
+
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.data-badge.daily{
+  color:var(--green);
+
+  border-color:
+    rgba(52,223,145,.22);
+
+  background:
+    rgba(52,223,145,.045);
+}
+
+.data-badge.delayed{
+  color:var(--amber);
+
+  border-color:
+    rgba(238,182,108,.22);
+}
+
+.data-badge.monthly{
+  color:var(--muted2);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer{
+  display:flex;
+  justify-content:space-between;
+
+  gap:20px;
+
+  padding:14px 30px 16px;
+
+  border-top:1px solid var(--line);
+
+  color:var(--muted2);
+
+  font-size:8px;
+  line-height:1.6;
+
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.footer strong{
+  color:#8fa097;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.error{
+  margin:50px 30px;
+
+  padding:20px;
+
+  border:1px solid rgba(228,123,114,.24);
+  border-radius:12px;
+
+  background:rgba(228,123,114,.04);
+
+  color:#eeb3ad;
+
+  font-size:12px;
+  line-height:1.65;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1050px){
+
+  .hero{
+    grid-template-columns:1fr;
+  }
+
+  .pulse-grid,
+  .benchmark-grid,
+  .intel-grid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .pulse:nth-child(2),
+  .benchmark:nth-child(2),
+  .intel:nth-child(2){
+    border-right:0;
+  }
+
+  .pulse:nth-child(-n+2),
+  .benchmark:nth-child(-n+2),
+  .intel:nth-child(-n+2){
+    border-bottom:1px solid var(--line);
+  }
+
+  .market-core,
+  .two-col{
+    grid-template-columns:1fr;
+  }
+
+  .chart-area,
+  .two-block:first-child{
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+
+}
+
+@media(max-width:650px){
+
+  .wrap{
+    padding:8px;
+  }
+
+  .shell{
+    border-radius:12px;
+  }
+
+  .topbar{
+    display:block;
+
+    padding:14px 16px;
+  }
+
+  .top-meta{
+    margin-top:9px;
+
+    flex-wrap:wrap;
+  }
+
+  .hero{
+    padding:
+      27px
+      17px
+      25px;
+  }
+
+  .hero-status{
+    grid-template-columns:1fr;
+  }
+
+  .pulse-grid,
+  .benchmark-grid,
+  .intel-grid{
+    grid-template-columns:1fr;
+  }
+
+  .pulse,
+  .benchmark,
+  .intel,
+  .pulse:nth-child(2),
+  .benchmark:nth-child(2),
+  .intel:nth-child(2){
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+
+  .pulse:last-child,
+  .benchmark:last-child,
+  .intel:last-child{
+    border-bottom:0;
+  }
+
+  .section-head{
+    display:block;
+
+    padding-left:17px;
+    padding-right:17px;
+  }
+
+  .section-side{
+    margin-top:9px;
+    text-align:left;
+  }
+
+  .chart-area,
+  .movers-area,
+  .two-block{
+    padding-left:17px;
+    padding-right:17px;
+  }
+
+  .chart-shell{
+    min-height:370px;
+  }
+
+  canvas{
+    height:370px;
+  }
+
+  .compact-row{
+    grid-template-columns:
+      minmax(0,1fr)
+      .8fr
+      .8fr;
+  }
+
+  .compact-row > :last-child{
+    display:none;
+  }
+
+  .table-tools{
+    padding-left:17px;
+    padding-right:17px;
+  }
+
+  .table-wrap{
+    margin-left:17px;
+    margin-right:17px;
+  }
+
+  .footer{
+    display:block;
+
+    padding-left:17px;
+    padding-right:17px;
+  }
+
+  .footer div + div{
+    margin-top:7px;
+  }
+
+}
+
+</style>
 </head>
+
 <body>
-  <main class="wrap">
-    <section class="hero">
-      <p class="eyebrow">BondStats Markets</p>
-      <h1>Bond Market Dashboard</h1>
-      <p>
-        A live global dashboard for sovereign 10-year bond markets. Track current benchmark yields,
-        largest daily movers, highest-yield markets, regional structure and cross-country spread dynamics
-        using the BondStats global yield feed.
-      </p>
-      <div class="hero-meta">
-        <div class="pill" id="updated-pill">Loading latest data...</div>
-        <div class="pill" id="tracked-pill">Tracking markets...</div>
-        <div class="pill">Live source: BondStats global yield feed</div>
-      </div>
-    </section>
 
-    <section class="grid-4">
-      <div class="stat">
-        <span class="stat-label">Highest 10Y Yield</span>
-        <div class="stat-value" id="highest-yield">—</div>
-        <div class="stat-note" id="highest-yield-note">Loading...</div>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Largest Daily Rise</span>
-        <div class="stat-value" id="largest-rise">—</div>
-        <div class="stat-note" id="largest-rise-note">Loading...</div>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Largest Daily Decline</span>
-        <div class="stat-value" id="largest-fall">—</div>
-        <div class="stat-note" id="largest-fall-note">Loading...</div>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Average Global Yield</span>
-        <div class="stat-value" id="avg-yield">—</div>
-        <div class="stat-note" id="avg-yield-note">Loading...</div>
-      </div>
-    </section>
+<div class="wrap">
 
-    <section class="panel">
-      <h2>Benchmark Markets</h2>
-      <p class="sub">
-        Major sovereign benchmarks that anchor global bond pricing and macro rate expectations.
-      </p>
+<div class="shell">
 
-      <div class="grid-4" id="benchmark-grid">
-        <div class="benchmark-card"><div class="empty">Loading benchmark markets...</div></div>
+
+  <!-- =====================================================
+       TOP BAR
+  ====================================================== -->
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <div class="live-dot"></div>
+
+      <div class="brand-name">
+        BondStats Market Intelligence
       </div>
-    </section>
 
-    <section class="grid-2">
-      <section class="panel">
-        <h2>Top 10 Highest Yields</h2>
-        <p class="sub">
-          Countries currently showing the highest 10-year sovereign yields in the live BondStats feed.
-        </p>
+    </div>
+
+
+    <div class="top-meta">
+
+      <span>
+        Sovereign Rates
+      </span>
+
+      <span>
+        Global 10Y Monitor
+      </span>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- =====================================================
+       HERO
+  ====================================================== -->
+
+  <section class="hero">
+
+    <div>
+
+      <div class="eyebrow">
+        Global Sovereign Rates
+      </div>
+
+      <h1>
+        Bond Market Dashboard
+      </h1>
+
+      <div class="hero-copy">
+        A global view of sovereign 10-year markets,
+        combining benchmark yields, true daily moves,
+        regional rate structure and spreads against
+        the U.S. Treasury benchmark.
+      </div>
+
+    </div>
+
+
+    <div class="hero-status">
+
+      <div class="status-cell">
+
+        <div class="status-label">
+          Feed Updated
+        </div>
+
+        <div
+          class="status-value"
+          id="updated-value"
+        >
+          Loading…
+        </div>
+
+        <div class="status-sub">
+          BondStats global yield feed
+        </div>
+
+      </div>
+
+
+      <div class="status-cell">
+
+        <div class="status-label">
+          Market Coverage
+        </div>
+
+        <div
+          class="status-value"
+          id="coverage-value"
+        >
+          Loading…
+        </div>
+
+        <div class="status-sub">
+          Sovereign markets tracked
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       PULSE
+  ====================================================== -->
+
+  <section class="pulse-grid">
+
+    <div class="pulse">
+
+      <div class="pulse-label">
+        Highest 10Y Yield
+      </div>
+
+      <div
+        class="pulse-value"
+        id="highest-yield"
+      >
+        —
+      </div>
+
+      <div
+        class="pulse-note"
+        id="highest-note"
+      >
+        Loading market data…
+      </div>
+
+    </div>
+
+
+    <div class="pulse">
+
+      <div class="pulse-label">
+        Largest Daily Rise
+      </div>
+
+      <div
+        class="pulse-value amber"
+        id="largest-rise"
+      >
+        —
+      </div>
+
+      <div
+        class="pulse-note"
+        id="rise-note"
+      >
+        Daily observations only
+      </div>
+
+    </div>
+
+
+    <div class="pulse">
+
+      <div class="pulse-label">
+        Largest Daily Decline
+      </div>
+
+      <div
+        class="pulse-value green"
+        id="largest-fall"
+      >
+        —
+      </div>
+
+      <div
+        class="pulse-note"
+        id="fall-note"
+      >
+        Daily observations only
+      </div>
+
+    </div>
+
+
+    <div class="pulse">
+
+      <div class="pulse-label">
+        Daily Data Coverage
+      </div>
+
+      <div
+        class="pulse-value green"
+        id="daily-coverage"
+      >
+        —
+      </div>
+
+      <div
+        class="pulse-note"
+        id="coverage-note"
+      >
+        Fresh daily or delayed series
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       BENCHMARKS
+  ====================================================== -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+
+        <div class="section-kicker">
+          Global Anchors
+        </div>
+
+        <h2>
+          Benchmark Markets
+        </h2>
+
+        <div class="section-copy">
+          Sovereign benchmarks that shape global
+          duration pricing and macro rate expectations.
+        </div>
+
+      </div>
+
+
+      <div class="section-side">
+        Yield · Change · Observation Date
+      </div>
+
+    </div>
+
+
+    <div
+      class="benchmark-grid"
+      id="benchmark-grid"
+    >
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       YIELDS + DAILY MOVERS
+  ====================================================== -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+
+        <div class="section-kicker">
+          Cross-Market Structure
+        </div>
+
+        <h2>
+          Global Yield Landscape
+        </h2>
+
+        <div class="section-copy">
+          Highest sovereign 10-year yields in the
+          current BondStats universe and genuine
+          daily market moves from daily-frequency series.
+        </div>
+
+      </div>
+
+
+      <div class="section-side">
+        Latest Available Observation
+      </div>
+
+    </div>
+
+
+    <div class="market-core">
+
+
+      <div class="chart-area">
+
+        <div class="sub-head">
+
+          <h3 class="sub-title">
+            Highest 10Y Yields
+          </h3>
+
+          <div class="sub-copy">
+            Top sovereign yields across all
+            currently available markets.
+          </div>
+
+        </div>
+
+
         <div class="chart-shell">
-          <canvas id="yieldChart" width="1200" height="430"></canvas>
-        </div>
-        <div class="footnote">
-          All values shown in this dashboard are based on current sovereign 10-year yields from the live BondStats global feed.
-        </div>
-      </section>
 
-      <section class="panel">
-        <h2>Market Movers</h2>
-        <p class="sub">
-          The strongest current yield increases and decreases across tracked sovereign markets.
-        </p>
+          <canvas
+            id="yieldChart"
+            width="920"
+            height="430"
+          ></canvas>
 
-        <div class="mini-card" style="margin-bottom:14px;">
-          <h3>Top risers</h3>
-          <div class="market-list" id="riser-list">
-            <div class="empty">Loading risers...</div>
-          </div>
         </div>
 
-        <div class="mini-card">
-          <h3>Top fallers</h3>
-          <div class="market-list" id="faller-list">
-            <div class="empty">Loading fallers...</div>
-          </div>
-        </div>
-      </section>
-    </section>
-
-    <section class="grid-2">
-      <section class="panel">
-        <h2>Regional Yield Structure</h2>
-        <p class="sub">
-          Average 10-year sovereign yields by region, based on currently tracked countries.
-        </p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Region</th>
-                <th>Average Yield</th>
-                <th>Average Change</th>
-                <th>Markets</th>
-              </tr>
-            </thead>
-            <tbody id="regional-table">
-              <tr><td colspan="4" class="empty">Loading regional data...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2>Global Spread Snapshot</h2>
-        <p class="sub">
-          Live spreads versus the US 10-year yield, showing where markets trade above or below the main benchmark.
-        </p>
-        <div class="market-list" id="spread-list">
-          <div class="empty">Loading spread snapshot...</div>
-        </div>
-      </section>
-    </section>
-
-    <section class="panel">
-      <h2>Full Market Table</h2>
-      <p class="sub">
-        Country-by-country sovereign 10-year market overview with live yield, recent move, spread versus US and update metadata.
-      </p>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Country</th>
-              <th>Region</th>
-              <th>10Y Yield</th>
-              <th>Recent Change</th>
-              <th>Spread vs US</th>
-              <th>Relative Strength</th>
-              <th>Date</th>
-              <th>Frequency</th>
-            </tr>
-          </thead>
-          <tbody id="market-table">
-            <tr><td colspan="8" class="empty">Loading data...</td></tr>
-          </tbody>
-        </table>
       </div>
-    </section>
-  </main>
 
-  <script>
-    const REGION_MAP = {
-      "United States": "North America",
-      "Canada": "North America",
-      "Mexico": "North America",
 
-      "Germany": "Europe",
-      "France": "Europe",
-      "Italy": "Europe",
-      "Spain": "Europe",
-      "Netherlands": "Europe",
-      "Portugal": "Europe",
-      "Greece": "Europe",
-      "Austria": "Europe",
-      "Belgium": "Europe",
-      "Finland": "Europe",
-      "Ireland": "Europe",
-      "Denmark": "Europe",
-      "Norway": "Europe",
-      "Sweden": "Europe",
-      "Switzerland": "Europe",
-      "Poland": "Europe",
-      "Czech Republic": "Europe",
-      "Hungary": "Europe",
-      "Slovakia": "Europe",
-      "Slovenia": "Europe",
-      "Lithuania": "Europe",
-      "United Kingdom": "Europe",
 
-      "Japan": "Asia-Pacific",
-      "China": "Asia-Pacific",
-      "India": "Asia-Pacific",
-      "South Korea": "Asia-Pacific",
-      "Singapore": "Asia-Pacific",
-      "Hong Kong": "Asia-Pacific",
-      "Australia": "Asia-Pacific",
-      "New Zealand": "Asia-Pacific",
+      <div class="movers-area">
 
-      "Israel": "Middle East / Africa",
-      "South Africa": "Middle East / Africa",
-      "Egypt": "Middle East / Africa",
+        <div class="sub-head">
 
-      "Brazil": "Latin America",
-      "Chile": "Latin America",
-      "Colombia": "Latin America",
-      "Peru": "Latin America"
-    };
+          <h3 class="sub-title">
+            Daily Movers
+          </h3>
 
-    function toNumber(value) {
-      const n = Number(value);
-      return Number.isFinite(n) ? n : null;
+          <div class="sub-copy">
+            Only daily-frequency series with
+            a valid prior observation are included.
+          </div>
+
+        </div>
+
+
+        <div class="mover-group">
+
+          <div class="mover-label">
+            <span>Yield Rising</span>
+            <span>Daily Move</span>
+          </div>
+
+          <div
+            class="mover-list"
+            id="riser-list"
+          ></div>
+
+        </div>
+
+
+        <div class="mover-group">
+
+          <div class="mover-label">
+            <span>Yield Falling</span>
+            <span>Daily Move</span>
+          </div>
+
+          <div
+            class="mover-list"
+            id="faller-list"
+          ></div>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+    <div class="intel-grid">
+
+      <div class="intel">
+
+        <div class="intel-label">
+          Average Global Yield
+        </div>
+
+        <div
+          class="intel-value"
+          id="average-yield"
+        >
+          —
+        </div>
+
+        <div class="intel-sub">
+          Mean across tracked sovereign markets.
+        </div>
+
+      </div>
+
+
+      <div class="intel">
+
+        <div class="intel-label">
+          Daily Series
+        </div>
+
+        <div
+          class="intel-value green"
+          id="daily-count"
+        >
+          —
+        </div>
+
+        <div class="intel-sub">
+          Markets currently supplied by daily-frequency sources.
+        </div>
+
+      </div>
+
+
+      <div class="intel">
+
+        <div class="intel-label">
+          Monthly Series
+        </div>
+
+        <div
+          class="intel-value"
+          id="monthly-count"
+        >
+          —
+        </div>
+
+        <div class="intel-sub">
+          Slower-frequency markets retained for global coverage.
+        </div>
+
+      </div>
+
+
+      <div class="intel">
+
+        <div class="intel-label">
+          U.S. Benchmark
+        </div>
+
+        <div
+          class="intel-value"
+          id="us-benchmark"
+        >
+          —
+        </div>
+
+        <div class="intel-sub">
+          Reference rate for cross-country spreads.
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       REGIONS + SPREADS
+  ====================================================== -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+
+        <div class="section-kicker">
+          Relative Value
+        </div>
+
+        <h2>
+          Market Structure
+        </h2>
+
+        <div class="section-copy">
+          Regional sovereign yield levels and
+          cross-market spreads relative to the
+          U.S. 10-year Treasury.
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="two-col">
+
+
+      <div class="two-block">
+
+        <h3 class="sub-title">
+          Regional Yield Structure
+        </h3>
+
+        <div class="sub-copy">
+          Average 10-year yields across currently
+          tracked sovereign markets.
+        </div>
+
+
+        <div
+          class="compact-table"
+          id="regional-table"
+        ></div>
+
+      </div>
+
+
+
+      <div class="two-block">
+
+        <h3 class="sub-title">
+          Spread vs U.S.
+        </h3>
+
+        <div class="sub-copy">
+          Largest positive sovereign spreads relative
+          to the U.S. 10-year benchmark.
+        </div>
+
+
+        <div
+          class="spread-list"
+          id="spread-list"
+        ></div>
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       FULL TABLE
+  ====================================================== -->
+
+  <section class="section table-section">
+
+    <div class="section-head">
+
+      <div>
+
+        <div class="section-kicker">
+          Sovereign Universe
+        </div>
+
+        <h2>
+          Full Market Monitor
+        </h2>
+
+        <div class="section-copy">
+          Country-level yields, observation frequency,
+          latest movement, spread to the U.S. and data freshness.
+        </div>
+
+      </div>
+
+
+      <div class="section-side">
+        Sorted by 10Y Yield
+      </div>
+
+    </div>
+
+
+    <div class="table-tools">
+
+      <input
+        id="market-search"
+        class="search"
+        type="search"
+        placeholder="Search country or region…"
+        autocomplete="off"
+      >
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Country</th>
+            <th>Region</th>
+            <th>10Y Yield</th>
+            <th>Latest Change</th>
+            <th>Spread vs U.S.</th>
+            <th>Observation</th>
+            <th>Frequency</th>
+            <th>Source</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody id="market-table">
+
+          <tr>
+            <td colspan="8">
+              Loading sovereign market data…
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer class="footer">
+
+    <div>
+      Data:
+      <strong>
+        BondStats Global Yield Feed
+      </strong>
+      · FRED · ECB · Riksbank · Other Official / Approved Sources
+    </div>
+
+    <div>
+      <strong>
+        BondStats
+      </strong>
+      · Fixed Income Intelligence
+    </div>
+
+  </footer>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+const DATA_URL =
+  "https://botapi33.github.io/bondstats-global-yields/global_yields.json";
+
+
+/* =========================================================
+   REGION MAP
+========================================================= */
+
+const REGION_MAP = {
+
+  "United States":"North America",
+  "Canada":"North America",
+  "Mexico":"North America",
+
+  "Germany":"Europe",
+  "France":"Europe",
+  "Italy":"Europe",
+  "Spain":"Europe",
+  "Netherlands":"Europe",
+  "Portugal":"Europe",
+  "Greece":"Europe",
+  "Austria":"Europe",
+  "Belgium":"Europe",
+  "Finland":"Europe",
+  "Ireland":"Europe",
+  "Denmark":"Europe",
+  "Norway":"Europe",
+  "Sweden":"Europe",
+  "Sweden (OECD)":"Europe",
+  "Switzerland":"Europe",
+  "Poland":"Europe",
+  "Czech Republic":"Europe",
+  "Hungary":"Europe",
+  "Slovakia":"Europe",
+  "Slovenia":"Europe",
+  "Lithuania":"Europe",
+  "United Kingdom":"Europe",
+  "Euro Area":"Europe",
+
+  "India":"Asia-Pacific",
+  "South Korea":"Asia-Pacific",
+  "Australia":"Asia-Pacific",
+  "New Zealand":"Asia-Pacific",
+  "Japan":"Asia-Pacific",
+  "China":"Asia-Pacific",
+  "Singapore":"Asia-Pacific",
+  "Hong Kong":"Asia-Pacific",
+
+  "Israel":"Middle East / Africa",
+  "South Africa":"Middle East / Africa",
+  "Egypt":"Middle East / Africa",
+
+  "Chile":"Latin America",
+  "Brazil":"Latin America",
+  "Colombia":"Latin America",
+  "Peru":"Latin America"
+};
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function num(value){
+
+  const n =
+    Number(value);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+
+}
+
+
+function fmtYield(value){
+
+  if(!Number.isFinite(value)){
+    return "—";
+  }
+
+  return value.toFixed(2) + "%";
+
+}
+
+
+function fmtChange(value){
+
+  if(!Number.isFinite(value)){
+    return "—";
+  }
+
+  return (
+    (value > 0 ? "+" : "")
+    +
+    value.toFixed(2)
+    +
+    " pp"
+  );
+
+}
+
+
+function fmtSpread(value){
+
+  return fmtChange(value);
+
+}
+
+
+function mean(values){
+
+  const valid =
+    values.filter(
+      Number.isFinite
+    );
+
+  if(!valid.length){
+    return null;
+  }
+
+  return (
+    valid.reduce(
+      (a,b)=>a+b,
+      0
+    )
+    /
+    valid.length
+  );
+
+}
+
+
+function moveClass(value){
+
+  if(!Number.isFinite(value)){
+    return "flat";
+  }
+
+  if(value > 0){
+    return "up";
+  }
+
+  if(value < 0){
+    return "down";
+  }
+
+  return "flat";
+
+}
+
+
+function statusClass(row){
+
+  const tier =
+    String(
+      row.tier || ""
+    ).toLowerCase();
+
+  if(
+    tier === "daily"
+  ){
+    return "daily";
+  }
+
+  if(
+    tier === "delayed"
+  ){
+    return "delayed";
+  }
+
+  return "monthly";
+
+}
+
+
+function sourceLabel(value){
+
+  const source =
+    String(value || "—")
+    .toLowerCase();
+
+  const labels = {
+    fred:"FRED",
+    ecb:"ECB",
+    riksbank:"Riksbank",
+    boc:"BoC",
+    rba:"RBA",
+    boe:"BoE",
+    bundesbank:"Bundesbank",
+    snb:"SNB",
+    norges:"Norges Bank",
+    rbnz:"RBNZ"
+  };
+
+  return (
+    labels[source]
+    ||
+    value
+    ||
+    "—"
+  );
+
+}
+
+
+/* =========================================================
+   NORMALIZE DATA
+========================================================= */
+
+function normalizeCountries(rawCountries){
+
+  return Object
+    .entries(
+      rawCountries || {}
+    )
+    .map(
+      ([key,item])=>{
+
+        const value =
+          num(item.value);
+
+        if(value === null){
+          return null;
+        }
+
+        const change =
+          (
+            item.change === null
+            ||
+            item.change === undefined
+            ||
+            item.change === ""
+          )
+          ?
+          null
+          :
+          num(item.change);
+
+        const label =
+          item.label
+          ||
+          key.replaceAll(
+            "_",
+            " "
+          );
+
+        return {
+
+          key,
+          label,
+
+          region:
+            REGION_MAP[label]
+            ||
+            "Other",
+
+          value,
+          change,
+
+          date:
+            item.date
+            ||
+            "—",
+
+          previousDate:
+            item.previousDate
+            ||
+            null,
+
+          previousValue:
+            num(
+              item.previousValue
+            ),
+
+          frequency:
+            item.frequency
+            ||
+            "—",
+
+          source:
+            item.source
+            ||
+            "—",
+
+          tier:
+            item.tier
+            ||
+            "monthly",
+
+          stalenessDays:
+            num(
+              item.stalenessDays
+            ),
+
+          isFallback:
+            Boolean(
+              item.isFallback
+            )
+        };
+
+      }
+    )
+    .filter(Boolean);
+
+}
+
+
+/* =========================================================
+   REAL DAILY MOVE CHECK
+========================================================= */
+
+function hasTrueDailyMove(row){
+
+  return (
+    String(
+      row.frequency
+    ).toLowerCase()
+    ===
+    "daily"
+    &&
+    Number.isFinite(
+      row.change
+    )
+    &&
+    row.previousDate
+    &&
+    row.previousDate
+    !==
+    row.date
+  );
+
+}
+
+
+/* =========================================================
+   BENCHMARKS
+========================================================= */
+
+function renderBenchmarks(rows){
+
+  const target =
+    document.getElementById(
+      "benchmark-grid"
+    );
+
+  const preferred = [
+    "United States",
+    "Germany",
+    "United Kingdom",
+    "France"
+  ];
+
+  const selected =
+    preferred
+      .map(
+        label =>
+          rows.find(
+            row =>
+              row.label === label
+          )
+      )
+      .filter(Boolean);
+
+  target.innerHTML =
+    selected.map(
+      (row,index)=>`
+
+        <div class="benchmark">
+
+          <div class="benchmark-top">
+
+            <span>
+              ${String(index + 1).padStart(2,"0")}
+            </span>
+
+            <span>
+              ${row.region}
+            </span>
+
+          </div>
+
+          <div class="benchmark-yield">
+            ${fmtYield(row.value)}
+          </div>
+
+          <div class="
+            benchmark-meta
+            ${moveClass(row.change)}
+          ">
+            ${
+              hasTrueDailyMove(row)
+              ?
+              fmtChange(row.change)
+              :
+              "Latest observation"
+            }
+            ·
+            ${row.date}
+          </div>
+
+        </div>
+
+      `
+    )
+    .join("");
+
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+function drawYieldChart(rows){
+
+  const canvas =
+    document.getElementById(
+      "yieldChart"
+    );
+
+  const ctx =
+    canvas.getContext("2d");
+
+  const scale =
+    window.devicePixelRatio
+    || 1;
+
+  const width =
+    canvas.clientWidth
+    || 900;
+
+  const height =
+    430;
+
+  canvas.width =
+    Math.round(
+      width * scale
+    );
+
+  canvas.height =
+    Math.round(
+      height * scale
+    );
+
+  ctx.scale(
+    scale,
+    scale
+  );
+
+  ctx.clearRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+  const top =
+    [...rows]
+      .sort(
+        (a,b)=>
+          b.value-a.value
+      )
+      .slice(
+        0,
+        10
+      );
+
+  if(!top.length){
+    return;
+  }
+
+  const left = 115;
+  const right = 55;
+  const topPad = 25;
+  const rowHeight = 38;
+  const barMax =
+    width-left-right;
+
+  const maxYield =
+    Math.max(
+      ...top.map(
+        row=>row.value
+      ),
+      1
+    );
+
+
+  top.forEach(
+    (row,index)=>{
+
+      const y =
+        topPad
+        +
+        index*rowHeight;
+
+      const barWidth =
+        (
+          row.value
+          /
+          maxYield
+        )
+        *
+        barMax;
+
+
+      ctx.fillStyle =
+        "#8d9b94";
+
+      ctx.font =
+        "11px -apple-system, BlinkMacSystemFont, Segoe UI, Arial";
+
+      ctx.textAlign =
+        "right";
+
+      ctx.fillText(
+        row.label,
+        left-12,
+        y+17
+      );
+
+
+      ctx.fillStyle =
+        "rgba(255,255,255,.045)";
+
+      roundRect(
+        ctx,
+        left,
+        y+7,
+        barMax,
+        8,
+        5
+      );
+
+
+      const gradient =
+        ctx.createLinearGradient(
+          left,
+          0,
+          left+barWidth,
+          0
+        );
+
+      gradient.addColorStop(
+        0,
+        "rgba(52,223,145,.42)"
+      );
+
+      gradient.addColorStop(
+        1,
+        "#34df91"
+      );
+
+      ctx.fillStyle =
+        gradient;
+
+      roundRect(
+        ctx,
+        left,
+        y+7,
+        Math.max(
+          barWidth,
+          2
+        ),
+        8,
+        5
+      );
+
+
+      ctx.fillStyle =
+        "#eef5f1";
+
+      ctx.font =
+        "600 11px -apple-system, BlinkMacSystemFont, Segoe UI, Arial";
+
+      ctx.textAlign =
+        "left";
+
+      ctx.fillText(
+        fmtYield(
+          row.value
+        ),
+        Math.min(
+          left
+          +
+          barWidth
+          +
+          10,
+          width-45
+        ),
+        y+17
+      );
+
     }
+  );
 
-    function fmtYield(v) {
-      if (!Number.isFinite(v)) return "—";
-      return v.toFixed(2) + "%";
+}
+
+
+function roundRect(
+  ctx,
+  x,
+  y,
+  width,
+  height,
+  radius
+){
+
+  const r =
+    Math.min(
+      radius,
+      width/2,
+      height/2
+    );
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    x+r,
+    y
+  );
+
+  ctx.arcTo(
+    x+width,
+    y,
+    x+width,
+    y+height,
+    r
+  );
+
+  ctx.arcTo(
+    x+width,
+    y+height,
+    x,
+    y+height,
+    r
+  );
+
+  ctx.arcTo(
+    x,
+    y+height,
+    x,
+    y,
+    r
+  );
+
+  ctx.arcTo(
+    x,
+    y,
+    x+width,
+    y,
+    r
+  );
+
+  ctx.closePath();
+
+  ctx.fill();
+
+}
+
+
+/* =========================================================
+   MOVERS
+========================================================= */
+
+function renderMovers(rows){
+
+  const daily =
+    rows.filter(
+      hasTrueDailyMove
+    );
+
+
+  const risers =
+    [...daily]
+      .filter(
+        row =>
+          row.change > 0
+      )
+      .sort(
+        (a,b)=>
+          b.change-a.change
+      )
+      .slice(
+        0,
+        5
+      );
+
+
+  const fallers =
+    [...daily]
+      .filter(
+        row =>
+          row.change < 0
+      )
+      .sort(
+        (a,b)=>
+          a.change-b.change
+      )
+      .slice(
+        0,
+        5
+      );
+
+
+  document
+    .getElementById(
+      "riser-list"
+    )
+    .innerHTML =
+      risers.length
+      ?
+      risers.map(
+        row=>`
+
+          <div class="mover-row">
+
+            <div class="mover-country">
+              ${row.label}
+            </div>
+
+            <div class="mover-value">
+              ${fmtYield(row.value)}
+            </div>
+
+            <div class="mover-change up">
+              ${fmtChange(row.change)}
+            </div>
+
+          </div>
+
+        `
+      ).join("")
+      :
+      `
+        <div class="mover-row">
+          <div class="flat">
+            No valid positive daily moves yet.
+          </div>
+        </div>
+      `;
+
+
+  document
+    .getElementById(
+      "faller-list"
+    )
+    .innerHTML =
+      fallers.length
+      ?
+      fallers.map(
+        row=>`
+
+          <div class="mover-row">
+
+            <div class="mover-country">
+              ${row.label}
+            </div>
+
+            <div class="mover-value">
+              ${fmtYield(row.value)}
+            </div>
+
+            <div class="mover-change down">
+              ${fmtChange(row.change)}
+            </div>
+
+          </div>
+
+        `
+      ).join("")
+      :
+      `
+        <div class="mover-row">
+          <div class="flat">
+            No valid negative daily moves yet.
+          </div>
+        </div>
+      `;
+
+}
+
+
+/* =========================================================
+   REGIONAL STRUCTURE
+========================================================= */
+
+function renderRegional(rows){
+
+  const groups = {};
+
+
+  rows.forEach(
+    row=>{
+
+      if(
+        !groups[row.region]
+      ){
+        groups[row.region] = [];
+      }
+
+      groups[row.region].push(
+        row
+      );
+
     }
+  );
 
-    function fmtChange(v) {
-      if (!Number.isFinite(v)) return "—";
-      const sign = v > 0 ? "+" : "";
-      return sign + v.toFixed(2) + " pp";
-    }
 
-    function fmtSpread(v) {
-      if (!Number.isFinite(v)) return "—";
-      const sign = v > 0 ? "+" : "";
-      return sign + v.toFixed(2) + " pp";
-    }
+  const regional =
+    Object
+      .entries(
+        groups
+      )
+      .map(
+        ([region,items])=>{
 
-    function mean(arr) {
-      if (!arr.length) return null;
-      return arr.reduce((a, b) => a + b, 0) / arr.length;
-    }
-
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
-    }
-
-    function normalizeCountries(rawCountries) {
-      return Object.entries(rawCountries || {})
-        .map(([key, item]) => {
-          const value = toNumber(item.value);
-          const rawChange = item.change;
-          const change = rawChange === null || rawChange === undefined || rawChange === ""
-            ? null
-            : toNumber(rawChange);
-
-          if (value === null) return null;
-
-          const label = item.label || key.replaceAll("_", " ");
+          const validDailyMoves =
+            items
+              .filter(
+                hasTrueDailyMove
+              )
+              .map(
+                item=>
+                  item.change
+              );
 
           return {
-            key,
-            label,
-            region: REGION_MAP[label] || "Other",
-            value,
-            change,
-            date: item.date || "—",
-            frequency: item.frequency || "—"
+
+            region,
+
+            average:
+              mean(
+                items.map(
+                  item=>
+                    item.value
+                )
+              ),
+
+            dailyMove:
+              mean(
+                validDailyMoves
+              ),
+
+            markets:
+              items.length
+
           };
-        })
-        .filter(Boolean);
-    }
 
-    function drawBarChart(rows) {
-      const canvas = document.getElementById("yieldChart");
-      const ctx = canvas.getContext("2d");
-      const w = canvas.width;
-      const h = canvas.height;
+        }
+      )
+      .sort(
+        (a,b)=>
+          (
+            b.average
+            ||
+            0
+          )
+          -
+          (
+            a.average
+            ||
+            0
+          )
+      );
 
-      ctx.clearRect(0, 0, w, h);
 
-      if (!rows.length) return;
+  const target =
+    document.getElementById(
+      "regional-table"
+    );
 
-      const top = [...rows].sort((a, b) => b.value - a.value).slice(0, 10);
 
-      const left = 70;
-      const right = 30;
-      const topPad = 30;
-      const bottom = 64;
-      const chartW = w - left - right;
-      const chartH = h - topPad - bottom;
+  target.innerHTML = `
 
-      const maxYield = Math.max(...top.map(r => r.value), 1);
+    <div class="compact-row head">
 
-      ctx.strokeStyle = "rgba(255,255,255,0.09)";
-      ctx.lineWidth = 1;
+      <div>Region</div>
 
-      for (let i = 0; i <= 4; i++) {
-        const y = topPad + (chartH / 4) * i;
-        ctx.beginPath();
-        ctx.moveTo(left, y);
-        ctx.lineTo(w - right, y);
-        ctx.stroke();
-      }
+      <div>Avg Yield</div>
 
-      const barSpace = chartW / top.length;
-      const barWidth = Math.min(42, barSpace * 0.58);
+      <div>Daily Move</div>
 
-      top.forEach((row, i) => {
-        const x = left + i * barSpace + (barSpace - barWidth) / 2;
-        const barHeight = (row.value / maxYield) * chartH;
-        const y = topPad + chartH - barHeight;
+      <div>Markets</div>
 
-        const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
-        grad.addColorStop(0, "#89b8ff");
-        grad.addColorStop(1, "#d7e8ff");
+    </div>
 
-        ctx.fillStyle = grad;
-        roundRect(ctx, x, y, barWidth, Math.max(6, barHeight), 8, true, false);
+    ${
+      regional.map(
+        row=>`
 
-        ctx.save();
-        ctx.translate(x + barWidth / 2, h - 14);
-        ctx.rotate(-0.62);
-        ctx.fillStyle = "#d9e6f8";
-        ctx.font = "12px Arial";
-        ctx.textAlign = "right";
-        ctx.fillText(row.label, 0, 0);
-        ctx.restore();
-      });
+          <div class="compact-row">
 
-      ctx.fillStyle = "#89a1bc";
-      ctx.font = "12px Arial";
-      ctx.textAlign = "right";
-      ctx.fillText(maxYield.toFixed(2) + "%", left - 10, topPad + 4);
-      ctx.fillText("0.00%", left - 10, topPad + chartH + 4);
-    }
+            <div class="compact-name">
+              ${row.region}
+            </div>
 
-    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
-      if (typeof radius === "number") {
-        radius = { tl: radius, tr: radius, br: radius, bl: radius };
-      } else {
-        radius = { tl: 0, tr: 0, br: 0, bl: 0, ...radius };
-      }
+            <div>
+              ${fmtYield(row.average)}
+            </div>
 
-      ctx.beginPath();
-      ctx.moveTo(x + radius.tl, y);
-      ctx.lineTo(x + width - radius.tr, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
-      ctx.lineTo(x + width, y + height - radius.br);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
-      ctx.lineTo(x + radius.bl, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
-      ctx.lineTo(x, y + radius.tl);
-      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
-      ctx.closePath();
+            <div class="${moveClass(row.dailyMove)}">
+              ${fmtChange(row.dailyMove)}
+            </div>
 
-      if (fill) ctx.fill();
-      if (stroke) ctx.stroke();
-    }
+            <div>
+              ${row.markets}
+            </div>
 
-    function renderBenchmarks(rows) {
-      const target = document.getElementById("benchmark-grid");
-      const labels = ["United States", "Germany", "Japan", "United Kingdom"];
-      const selected = labels.map(label => rows.find(r => r.label === label)).filter(Boolean);
-
-      if (!selected.length) {
-        target.innerHTML = '<div class="benchmark-card"><div class="empty">No benchmark data available.</div></div>';
-        return;
-      }
-
-      target.innerHTML = selected.map(r => `
-        <div class="benchmark-card">
-          <div class="benchmark-name">${r.label}</div>
-          <div class="benchmark-yield">${fmtYield(r.value)}</div>
-          <div class="benchmark-change ${Number.isFinite(r.change) && r.change > 0 ? "positive" : Number.isFinite(r.change) && r.change < 0 ? "negative" : ""}">
-            ${fmtChange(r.change)} • ${r.date}
           </div>
-        </div>
-      `).join("");
+
+        `
+      ).join("")
     }
 
-    function renderMovers(rows) {
-      const risers = [...rows]
-        .filter(r => Number.isFinite(r.change))
-        .sort((a, b) => b.change - a.change)
-        .slice(0, 5);
+  `;
 
-      const fallers = [...rows]
-        .filter(r => Number.isFinite(r.change))
-        .sort((a, b) => a.change - b.change)
-        .slice(0, 5);
+}
 
-      const riserTarget = document.getElementById("riser-list");
-      const fallerTarget = document.getElementById("faller-list");
 
-      riserTarget.innerHTML = risers.length ? risers.map(r => `
-        <div class="market-row">
-          <div class="market-name">${r.label}</div>
-          <div>${fmtYield(r.value)}</div>
-          <div class="positive">${fmtChange(r.change)}</div>
-          <div>${r.region}</div>
-        </div>
-      `).join("") : '<div class="empty">No riser data available.</div>';
+/* =========================================================
+   SPREADS
+========================================================= */
 
-      fallerTarget.innerHTML = fallers.length ? fallers.map(r => `
-        <div class="market-row">
-          <div class="market-name">${r.label}</div>
-          <div>${fmtYield(r.value)}</div>
-          <div class="negative">${fmtChange(r.change)}</div>
-          <div>${r.region}</div>
-        </div>
-      `).join("") : '<div class="empty">No faller data available.</div>';
-    }
+function renderSpreads(rows){
 
-    function renderRegional(rows) {
-      const groups = {};
-      rows.forEach(r => {
-        if (!groups[r.region]) groups[r.region] = [];
-        groups[r.region].push(r);
-      });
+  const target =
+    document.getElementById(
+      "spread-list"
+    );
 
-      const regional = Object.entries(groups)
-        .map(([region, items]) => ({
-          region,
-          avgYield: mean(items.map(i => i.value)),
-          avgChange: mean(items.filter(i => Number.isFinite(i.change)).map(i => i.change)),
-          count: items.length
-        }))
-        .sort((a, b) => (b.avgYield ?? 0) - (a.avgYield ?? 0));
+  const us =
+    rows.find(
+      row =>
+        row.label
+        ===
+        "United States"
+    );
 
-      const tbody = document.getElementById("regional-table");
-      if (!regional.length) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty">No regional data available.</td></tr>';
-        return;
+  if(!us){
+
+    target.innerHTML =
+      '<div class="flat">U.S. benchmark unavailable.</div>';
+
+    return;
+
+  }
+
+
+  const spreads =
+    rows
+      .filter(
+        row =>
+          row.label
+          !==
+          "United States"
+      )
+      .map(
+        row=>({
+          ...row,
+          spread:
+            row.value
+            -
+            us.value
+        })
+      )
+      .sort(
+        (a,b)=>
+          b.spread-a.spread
+      )
+      .slice(
+        0,
+        8
+      );
+
+
+  const maxSpread =
+    Math.max(
+      ...spreads.map(
+        row =>
+          Math.abs(
+            row.spread
+          )
+      ),
+      .1
+    );
+
+
+  target.innerHTML =
+    spreads.map(
+      row=>{
+
+        const width =
+          Math.min(
+            100,
+            (
+              Math.abs(
+                row.spread
+              )
+              /
+              maxSpread
+            )
+            *
+            100
+          );
+
+        return `
+
+          <div class="spread-row">
+
+            <div class="spread-country">
+              ${row.label}
+            </div>
+
+            <div class="
+              spread-num
+              ${moveClass(row.spread)}
+            ">
+              ${fmtSpread(row.spread)}
+            </div>
+
+            <div class="spread-track">
+
+              <div
+                class="spread-fill"
+                style="width:${width}%"
+              ></div>
+
+            </div>
+
+          </div>
+
+        `;
+
       }
+    )
+    .join("");
 
-      tbody.innerHTML = regional.map(r => `
+}
+
+
+/* =========================================================
+   FULL MARKET TABLE
+========================================================= */
+
+let ALL_ROWS = [];
+
+
+function renderTable(rows){
+
+  const tbody =
+    document.getElementById(
+      "market-table"
+    );
+
+  const us =
+    ALL_ROWS.find(
+      row =>
+        row.label
+        ===
+        "United States"
+    );
+
+
+  if(!rows.length){
+
+    tbody.innerHTML = `
+
+      <tr>
+
+        <td colspan="8">
+          No matching markets.
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+
+  }
+
+
+  const sorted =
+    [...rows]
+      .map(
+        row=>({
+
+          ...row,
+
+          spread:
+            us
+            ?
+            row.value-us.value
+            :
+            null
+
+        })
+      )
+      .sort(
+        (a,b)=>
+          b.value-a.value
+      );
+
+
+  tbody.innerHTML =
+    sorted.map(
+      row=>`
+
         <tr>
-          <td class="country">${r.region}</td>
-          <td>${fmtYield(r.avgYield)}</td>
-          <td class="${Number.isFinite(r.avgChange) && r.avgChange > 0 ? "positive" : Number.isFinite(r.avgChange) && r.avgChange < 0 ? "negative" : ""}">
-            ${fmtChange(r.avgChange)}
+
+          <td class="country-name">
+            ${row.label}
           </td>
-          <td>${r.count}</td>
+
+          <td>
+            ${row.region}
+          </td>
+
+          <td>
+            ${fmtYield(row.value)}
+          </td>
+
+          <td class="${moveClass(row.change)}">
+            ${
+              Number.isFinite(
+                row.change
+              )
+              ?
+              fmtChange(
+                row.change
+              )
+              :
+              "—"
+            }
+          </td>
+
+          <td class="${moveClass(row.spread)}">
+            ${fmtSpread(row.spread)}
+          </td>
+
+          <td>
+            ${row.date}
+          </td>
+
+          <td>
+
+            <span class="
+              data-badge
+              ${statusClass(row)}
+            ">
+              ${row.frequency}
+            </span>
+
+          </td>
+
+          <td>
+            ${sourceLabel(row.source)}
+          </td>
+
         </tr>
-      `).join("");
+
+      `
+    )
+    .join("");
+
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function renderSummary(rows,data){
+
+  const highest =
+    [...rows]
+      .sort(
+        (a,b)=>
+          b.value-a.value
+      )[0]
+      ||
+      null;
+
+
+  const trueDaily =
+    rows.filter(
+      hasTrueDailyMove
+    );
+
+
+  const largestRise =
+    [...trueDaily]
+      .filter(
+        row =>
+          row.change > 0
+      )
+      .sort(
+        (a,b)=>
+          b.change-a.change
+      )[0]
+      ||
+      null;
+
+
+  const largestFall =
+    [...trueDaily]
+      .filter(
+        row =>
+          row.change < 0
+      )
+      .sort(
+        (a,b)=>
+          a.change-b.change
+      )[0]
+      ||
+      null;
+
+
+  const dailySeries =
+    rows.filter(
+      row =>
+        String(
+          row.frequency
+        ).toLowerCase()
+        ===
+        "daily"
+    );
+
+
+  const monthlySeries =
+    rows.filter(
+      row =>
+        String(
+          row.frequency
+        ).toLowerCase()
+        ===
+        "monthly"
+    );
+
+
+  const averageYield =
+    mean(
+      rows.map(
+        row =>
+          row.value
+      )
+    );
+
+
+  const us =
+    rows.find(
+      row =>
+        row.label
+        ===
+        "United States"
+    );
+
+
+  const dailyCoverage =
+    rows.length
+    ?
+    (
+      dailySeries.length
+      /
+      rows.length
+      *
+      100
+    )
+    :
+    0;
+
+
+  document
+    .getElementById(
+      "updated-value"
+    )
+    .textContent =
+      data.meta?.lastUpdated
+      ||
+      "—";
+
+
+  document
+    .getElementById(
+      "coverage-value"
+    )
+    .textContent =
+      rows.length
+      +
+      " markets";
+
+
+  document
+    .getElementById(
+      "highest-yield"
+    )
+    .textContent =
+      highest
+      ?
+      fmtYield(
+        highest.value
+      )
+      :
+      "—";
+
+
+  document
+    .getElementById(
+      "highest-note"
+    )
+    .textContent =
+      highest
+      ?
+      highest.label
+      +
+      " · "
+      +
+      highest.date
+      :
+      "No market data";
+
+
+  document
+    .getElementById(
+      "largest-rise"
+    )
+    .textContent =
+      largestRise
+      ?
+      fmtChange(
+        largestRise.change
+      )
+      :
+      "—";
+
+
+  document
+    .getElementById(
+      "rise-note"
+    )
+    .textContent =
+      largestRise
+      ?
+      largestRise.label
+      +
+      " · true daily move"
+      :
+      "Awaiting comparable daily observations";
+
+
+  document
+    .getElementById(
+      "largest-fall"
+    )
+    .textContent =
+      largestFall
+      ?
+      fmtChange(
+        largestFall.change
+      )
+      :
+      "—";
+
+
+  document
+    .getElementById(
+      "fall-note"
+    )
+    .textContent =
+      largestFall
+      ?
+      largestFall.label
+      +
+      " · true daily move"
+      :
+      "Awaiting comparable daily observations";
+
+
+  document
+    .getElementById(
+      "daily-coverage"
+    )
+    .textContent =
+      dailyCoverage.toFixed(0)
+      +
+      "%";
+
+
+  document
+    .getElementById(
+      "coverage-note"
+    )
+    .textContent =
+      dailySeries.length
+      +
+      " of "
+      +
+      rows.length
+      +
+      " tracked markets";
+
+
+  document
+    .getElementById(
+      "average-yield"
+    )
+    .textContent =
+      fmtYield(
+        averageYield
+      );
+
+
+  document
+    .getElementById(
+      "daily-count"
+    )
+    .textContent =
+      dailySeries.length
+      +
+      " markets";
+
+
+  document
+    .getElementById(
+      "monthly-count"
+    )
+    .textContent =
+      monthlySeries.length
+      +
+      " markets";
+
+
+  document
+    .getElementById(
+      "us-benchmark"
+    )
+    .textContent =
+      us
+      ?
+      fmtYield(
+        us.value
+      )
+      :
+      "—";
+
+}
+
+
+/* =========================================================
+   LOAD
+========================================================= */
+
+async function loadDashboard(){
+
+  try{
+
+    const response =
+      await fetch(
+        DATA_URL
+        +
+        "?ts="
+        +
+        Date.now(),
+        {
+          cache:"no-store"
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "Global yield feed request failed."
+      );
+
     }
 
-    function renderSpreads(rows) {
-      const us = rows.find(r => r.label === "United States");
-      const target = document.getElementById("spread-list");
 
-      if (!us) {
-        target.innerHTML = '<div class="empty">US benchmark unavailable.</div>';
-        return;
+    const data =
+      await response.json();
+
+
+    if(
+      !data
+      ||
+      !data.countries
+    ){
+
+      throw new Error(
+        "Global yield feed is incomplete."
+      );
+
+    }
+
+
+    const rows =
+      normalizeCountries(
+        data.countries
+      );
+
+
+    if(!rows.length){
+
+      throw new Error(
+        "No valid sovereign yield observations."
+      );
+
+    }
+
+
+    ALL_ROWS =
+      rows;
+
+
+    renderSummary(
+      rows,
+      data
+    );
+
+    renderBenchmarks(
+      rows
+    );
+
+    drawYieldChart(
+      rows
+    );
+
+    renderMovers(
+      rows
+    );
+
+    renderRegional(
+      rows
+    );
+
+    renderSpreads(
+      rows
+    );
+
+    renderTable(
+      rows
+    );
+
+
+    const search =
+      document.getElementById(
+        "market-search"
+      );
+
+
+    search.addEventListener(
+      "input",
+      event=>{
+
+        const query =
+          event.target.value
+            .trim()
+            .toLowerCase();
+
+
+        if(!query){
+
+          renderTable(
+            ALL_ROWS
+          );
+
+          return;
+
+        }
+
+
+        const filtered =
+          ALL_ROWS.filter(
+            row=>
+
+              row.label
+                .toLowerCase()
+                .includes(
+                  query
+                )
+
+              ||
+
+              row.region
+                .toLowerCase()
+                .includes(
+                  query
+                )
+
+          );
+
+
+        renderTable(
+          filtered
+        );
+
       }
+    );
 
-      const spreadRows = rows
-        .filter(r => r.label !== "United States")
-        .map(r => ({ ...r, spread: r.value - us.value }))
-        .sort((a, b) => b.spread - a.spread)
-        .slice(0, 8);
 
-      target.innerHTML = spreadRows.length ? spreadRows.map(r => `
-        <div class="market-row">
-          <div class="market-name">${r.label}</div>
-          <div>${fmtYield(r.value)}</div>
-          <div class="${r.spread >= 0 ? "positive" : "negative"}">${fmtSpread(r.spread)}</div>
-          <div>${r.region}</div>
-        </div>
-      `).join("") : '<div class="empty">No spread data available.</div>';
-    }
+    window.addEventListener(
+      "resize",
+      ()=>{
 
-    function renderTable(rows) {
-      const us = rows.find(r => r.label === "United States");
-      const tbody = document.getElementById("market-table");
+        clearTimeout(
+          window.__bondstatsResize
+        );
 
-      if (!rows.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty">No market data available.</td></tr>';
-        return;
+        window.__bondstatsResize =
+          setTimeout(
+            ()=>{
+
+              drawYieldChart(
+                ALL_ROWS
+              );
+
+            },
+            120
+          );
+
       }
+    );
 
-      const rowsWithSpreads = rows.map(r => ({
-        ...r,
-        spread: us ? r.value - us.value : null
-      }));
+  }
 
-      const maxAbsSpread = Math.max(...rowsWithSpreads.map(r => Math.abs(r.spread ?? 0)), 0.1);
+  catch(error){
 
-      tbody.innerHTML = rowsWithSpreads
-        .sort((a, b) => b.value - a.value)
-        .map(r => {
-          const width = (Math.abs(r.spread ?? 0) / maxAbsSpread) * 100;
-          return `
-            <tr>
-              <td class="country">${r.label}</td>
-              <td>${r.region}</td>
-              <td>${fmtYield(r.value)}</td>
-              <td class="${Number.isFinite(r.change) && r.change > 0 ? "positive" : Number.isFinite(r.change) && r.change < 0 ? "negative" : ""}">
-                ${fmtChange(r.change)}
-              </td>
-              <td class="${Number.isFinite(r.spread) && r.spread >= 0 ? "positive" : "negative"}">
-                ${fmtSpread(r.spread)}
-              </td>
-              <td class="bar-cell">
-                <div class="bar-track">
-                  <div class="bar-fill" style="width:${clamp(width, 0, 100)}%"></div>
-                </div>
-              </td>
-              <td>${r.date}</td>
-              <td>${r.frequency}</td>
-            </tr>
-          `;
-        }).join("");
-    }
+    document
+      .querySelector(
+        ".shell"
+      )
+      .insertAdjacentHTML(
+        "beforeend",
+        `
 
-    fetch("https://botapi33.github.io/bondstats-global-yields/global_yields.json?ts=" + Date.now())
-      .then(r => r.json())
-      .then(data => {
-        const rows = normalizeCountries(data.countries);
+          <div class="error">
 
-        document.getElementById("updated-pill").textContent =
-          "Updated: " + (data.meta?.lastUpdated || "—");
-        document.getElementById("tracked-pill").textContent =
-          rows.length + " countries tracked";
+            <strong>
+              Bond Market Dashboard
+            </strong>
 
-        const highest = [...rows].sort((a, b) => b.value - a.value)[0] || null;
-        const largestRise = [...rows].filter(r => Number.isFinite(r.change)).sort((a, b) => b.change - a.change)[0] || null;
-        const largestFall = [...rows].filter(r => Number.isFinite(r.change)).sort((a, b) => a.change - b.change)[0] || null;
-        const avgYield = mean(rows.map(r => r.value));
+            <br><br>
 
-        document.getElementById("highest-yield").textContent = highest ? fmtYield(highest.value) : "—";
-        document.getElementById("highest-yield-note").textContent = highest ? highest.label + " • highest live 10Y yield" : "No data";
+            Market data is temporarily unavailable.
 
-        document.getElementById("largest-rise").textContent = largestRise ? fmtChange(largestRise.change) : "—";
-        document.getElementById("largest-rise-note").textContent = largestRise ? largestRise.label + " • strongest rise" : "No data";
+            <br><br>
 
-        document.getElementById("largest-fall").textContent = largestFall ? fmtChange(largestFall.change) : "—";
-        document.getElementById("largest-fall-note").textContent = largestFall ? largestFall.label + " • strongest decline" : "No data";
+            ${
+              error?.message
+              ||
+              "Unknown data error."
+            }
 
-        document.getElementById("avg-yield").textContent = Number.isFinite(avgYield) ? fmtYield(avgYield) : "—";
-        document.getElementById("avg-yield-note").textContent = "Average across tracked sovereign markets";
+          </div>
 
-        renderBenchmarks(rows);
-        drawBarChart(rows);
-        renderMovers(rows);
-        renderRegional(rows);
-        renderSpreads(rows);
-        renderTable(rows);
-      })
-      .catch(() => {
-        document.getElementById("updated-pill").textContent = "Unable to load data";
-        document.getElementById("tracked-pill").textContent = "Data unavailable";
-        document.getElementById("highest-yield").textContent = "—";
-        document.getElementById("highest-yield-note").textContent = "Data unavailable";
-        document.getElementById("largest-rise").textContent = "—";
-        document.getElementById("largest-rise-note").textContent = "Data unavailable";
-        document.getElementById("largest-fall").textContent = "—";
-        document.getElementById("largest-fall-note").textContent = "Data unavailable";
-        document.getElementById("avg-yield").textContent = "—";
-        document.getElementById("avg-yield-note").textContent = "Data unavailable";
-        document.getElementById("benchmark-grid").innerHTML = '<div class="benchmark-card"><div class="empty">Error loading benchmark data.</div></div>';
-        document.getElementById("riser-list").innerHTML = '<div class="empty">Error loading risers.</div>';
-        document.getElementById("faller-list").innerHTML = '<div class="empty">Error loading fallers.</div>';
-        document.getElementById("regional-table").innerHTML = '<tr><td colspan="4" class="empty">Error loading regional data.</td></tr>';
-        document.getElementById("spread-list").innerHTML = '<div class="empty">Error loading spreads.</div>';
-        document.getElementById("market-table").innerHTML = '<tr><td colspan="8" class="empty">Error loading data.</td></tr>';
-      });
-  </script>
+        `
+      );
+
+  }
+
+}
+
+
+loadDashboard();
+
+</script>
+
 </body>
 </html>
